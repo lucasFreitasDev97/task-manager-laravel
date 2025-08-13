@@ -17,7 +17,7 @@ return new class extends Migration
             $table->string('title');
             $table->text('description')->nullable();
             $table->date('deadline')->nullable();
-            $table->boolean('completed')->default(false);
+            $table->enum('status', ['not_started', 'ongoing', 'completed'])->default('not_started');
             $table->softDeletes();
             $table->timestamps();
         });
