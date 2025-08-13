@@ -34,7 +34,7 @@ class TaskController extends Controller
         $data = $taskRequest->validated();
         $this->taskService->store($data);
 
-        return redirect()->route('task.index');
+        return redirect()->route('tasks.index');
     }
 
     public function update(Task $task, TaskRequest $taskRequest): RedirectResponse
@@ -42,12 +42,12 @@ class TaskController extends Controller
         $data = $taskRequest->validated();
         $this->taskService->update($task, $data);
 
-        return redirect()->route('task.index');
+        return redirect()->route('tasks.index');
     }
 
     public function destroy(Task $task): RedirectResponse
     {
         $this->taskService->destroy($task);
-        return redirect()->route('task.index');
+        return redirect()->route('tasks.index');
     }
 }
