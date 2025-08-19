@@ -23,6 +23,9 @@ class TaskRequest extends FormRequest
     {
         return [
             'title' => 'required|string|max:255',
+            'description' => 'string',
+            'deadline' => 'date',
+            'status' => 'string',
         ];
     }
 }

@@ -3,16 +3,13 @@
 namespace App\Services;
 
 use App\Models\Task;
+use App\Models\User;
 
 class TaskService
 {
-    public function store(array $data): Task
+    public function store(array $data, User $user): Task
     {
-        $task = new Task();
-        $task->fill($data);
-        $task->save();
-
-        return $task;
+        return $user->tasks()->create($data);
     }
 
     public function update( Task $task, array $data): Task

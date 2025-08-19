@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\TaskStatus;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -12,6 +13,12 @@ class Task extends Model
 
     protected $table = 'tasks';
     protected $fillable = ['title','description', 'deadline', 'status'];
+
+    protected $casts = [
+        'deadline' => 'date',
+        'status' => TaskStatus::class,
+    ];
+
 
     public function user(): BelongsTo
     {

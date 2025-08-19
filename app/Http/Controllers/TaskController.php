@@ -32,7 +32,8 @@ class TaskController extends Controller
     public function store(TaskRequest $taskRequest): RedirectResponse
     {
         $data = $taskRequest->validated();
-        $this->taskService->store($data);
+        $authenticatedUser = auth()->user();
+        $this->taskService->store($data, $authenticatedUser);
 
         return redirect()->route('tasks.index');
     }

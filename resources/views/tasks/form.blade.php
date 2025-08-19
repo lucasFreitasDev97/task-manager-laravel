@@ -1,79 +1,86 @@
-<!-- resources/views/tasks/form.blade.php -->
-
-@extends('layouts.app')
-
-@section('content')
-    <div class="max-w-xl mx-auto p-6 bg-white rounded-lg shadow-md">
-        <h1 class="text-2xl font-bold mb-4">
-            {{ $task ? 'Editar Tarefa' : 'Nova Tarefa' }}
-        </h1>
-
-        @if ($errors->any())
-            <div class="mb-4 p-4 bg-red-100 text-red-700 rounded">
-                <ul>
-                    @foreach ($errors->all() as $error)
-                        <li>{{ $error }}</li>
-                    @endforeach
-                </ul>
-            </div>
-        @endif
-
-        <form action="{{ $task ? route('task.update', $task) : route('task.store') }}" method="POST">
-            @csrf
-            @if($task)
-                @method('PUT')
+<x-app-layout>
+    <x-slot name="header">
+        <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
+            @if(isset($task))
+                {{ __("Editar tarefa: $task->title") }}
+            @else
+                {{ __('Criar nova tarefa') }}
             @endif
+        </h2>
+    </x-slot>
+    <div class="py-12">
+        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-6">
+            <div class="p-4 sm:p-8 bg-white dark:bg-gray-800 shadow sm:rounded-lg">
+                <div class="max-w-xl">
+                    <form method="POST" action="{{ isset($task) ? route('tasks.update', $task) : route('tasks.store') }}" class="space-y-6">
+                        @csrf
+                        @if(isset($task))
+                            @method('PUT')
+                        @endif
+                        <div>
+                            <x-input-label for="title" :value="__('Título')" />
+                            <x-text-input
+                                id="title"
+                                name="title"
+                                type="text"
+                                class="mt-1 block w-full"
+                                :value="old('title', $task?->title)"
+                                required
+                                autofocus />
+                            <x-input-error class="mt-2" :messages="$errors->get('title')" />
+                        </div>
 
-            <div class="mb-4">
-                <label class="block text-gray-700 font-medium mb-1" for="title">Título</label>
-                <input
-                    type="text"
-                    id="title"
-                    name="title"
-                    value="{{ old('title', $task->title ?? '') }}"
-                    class="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    required
-                >
-            </div>
+                        <div>
+                            <x-input-label for="description" :value="__('Descrição')" />
+                            <textarea
+                                id="description"
+                                name="description"
+                                class="border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 focus:border-indigo-500 dark:focus:border-indigo-600 focus:ring-indigo-500 dark:focus:ring-indigo-600 rounded-md shadow-sm mt-1 block w-full"
+                                rows="4"
+                            >{{ old('description', $task?->description) }}</textarea>
+                            <x-input-error class="mt-2" :messages="$errors->get('description')" />
+                        </div>
 
-            <div class="mb-4">
-                <label class="block text-gray-700 font-medium mb-1" for="description">Descrição</label>
-                <textarea
-                    id="description"
-                    name="description"
-                    rows="4"
-                    class="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                >{{ old('description', $task->description ?? '') }}</textarea>
-            </div>
+                        <div>
+                            <x-input-label for="deadline" :value="__('Prazo Final')" />
+                            <x-text-input
+                                id="deadline"
+                                name="deadline"
+                                type="date"
+                                class="mt-1 block w-full"
+                                :value="old('deadline', isset($task->deadline) ? $task->deadline->format('Y-m-d') : '')"
+                                required />
+                            <x-input-error class="mt-2" :messages="$errors->get('deadline')" />
+                        </div>
 
-            <div class="mb-4">
-                <label class="block text-gray-700 font-medium mb-1" for="status">Status</label>
-                <select
-                    id="status"
-                    name="status"
-                    class="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    required
-                >
-                    @php
-                        $statuses = ['not_started' => 'Não iniciada', 'in_progress' => 'Em progresso', 'completed' => 'Concluída'];
-                    @endphp
-                    @foreach($statuses as $key => $label)
-                        <option value="{{ $key }}" {{ old('status', $task->status ?? '') === $key ? 'selected' : '' }}>
-                            {{ $label }}
-                        </option>
-                    @endforeach
-                </select>
+                        @if(isset($task))
+                            <div>
+                                <x-input-label for="status" :value="__('Status')" />
+                                <select
+                                    id="status"
+                                    name="status"
+                                    class="border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 focus:border-indigo-500 dark:focus:border-indigo-600 focus:ring-indigo-500 dark:focus:ring-indigo-600 rounded-md shadow-sm mt-1 block w-full"
+                                    required>
+                                    <option value="not_started" @if(old('status', $task->status) == 'not_started') selected @endif>
+                                        Não Iniciada
+                                    </option>
+                                    <option value="ongoing" @if(old('status', $task->status) == 'ongoing') selected @endif>
+                                        Em Andamento
+                                    </option>
+                                    <option value="completed" @if(old('status', $task->status) == 'completed') selected @endif>
+                                        Completa
+                                    </option>
+                                </select>
+                                <x-input-error class="mt-2" :messages="$errors->get('status')" />
+                            </div>
+                        @endif
+
+                        <div class="flex items-center gap-4">
+                            <x-primary-button>{{ isset($task) ? __('Salvar Alterações') : __('Criar Tarefa') }}</x-primary-button>
+                        </div>
+                    </form>
+                </div>
             </div>
-            
-            <div>
-                <button
-                    type="submit"
-                    class="bg-blue-500 text-white font-medium px-4 py-2 rounded hover:bg-blue-600"
-                >
-                    {{ $task ? 'Atualizar' : 'Criar' }}
-                </button>
-            </div>
-        </form>
+        </div>
     </div>
-@endsection
-
+</x-app-layout>
